@@ -18,7 +18,7 @@ const Sidebar = () => {
             const {data} = await axios.post('/api/owner/update-image', formData)
 
             if(data.success) {
-                fetchUser
+                fetchUser()
                 toast.success(data.message)
                 setImage('')
             } else {
@@ -35,7 +35,7 @@ const Sidebar = () => {
         <div className='group relative'>
             <label htmlFor="image">
                 <img src={image ? URL.createObjectURL(image) : user?.image || "https://media.istockphoto.com/id/2277745612/photo/confident-businessman-leading-ai-business-solutions-in-modern-office.jpg?s=2048x2048&w=is&k=20&c=iGvgvxIkkVzvYzOKNueakcSTOTDAyCR2BwLtHI5m6xE="} alt="" className='h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto' />
-                <input type="file" id='image' accept='imagee/*' hidden onChange={e=>setImage(e.target.files[0])} />
+                <input type="file" id='image' accept='image/*' hidden onChange={e=>setImage(e.target.files[0])} />
 
                 <div className='absolute hidden top-0 right-0 left-0 bottom-0 bg-black/10 rounded-full group-hover:flex items-center justify-center cursor-pointer'>
                     <img src={assets.edit_icon} alt="" />

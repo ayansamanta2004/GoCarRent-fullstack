@@ -13,7 +13,7 @@ const Banner = () => {
       <div className='text-white'>
         <h2 className='text-3xl font-medium'>Do You Own a Luxury Car?</h2>
         <p className='mt-2'>Monetize your vehicle effortlessly by listing it on GoCarRent.</p>
-        <p className='max-w-130'>We take care of insurance, driver verification and decure payments - so you can earn passive income, stress-free.</p>
+        <p className='max-w-130'>We take care of insurance, driver verification and secure payments - so you can earn passive income, stress-free.</p>
 
         <motion.button
           whileHover={{ scale: 1.05 }}

@@ -184,6 +184,15 @@ export const changeBookingStatus = async (req, res) => {
         const { bookingId, status } = req.body
 
         const booking = await Booking.findById(bookingId)
+            .populate("user")
+            .populate("car");
+
+        if (!booking) {
+            return res.json({
+                success: false,
+                message: "Booking not found"
+            });
+        }
 
         if (booking.owner.toString() !== _id.toString()) {
             return res.json({ success: false, message: "Unauthorized" })
@@ -191,6 +200,75 @@ export const changeBookingStatus = async (req, res) => {
 
         booking.status = status;
         await booking.save();
+
+        let subject = "";
+
+        if (status === "confirmed") {
+            subject = "🎉 Your GoCarRent Booking has been Confirmed!";
+        } else if (status === "cancelled") {
+            subject = "❌ Your GoCarRent Booking has been Cancelled";
+        }
+
+        const html = `
+<div style="font-family: Arial, sans-serif; line-height:1.6">
+
+    <h2>Hello ${booking.user.name},</h2>
+
+    <p>Your booking status has been updated.</p>
+
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+            <td><strong>Car</strong></td>
+            <td>${booking.car.brand} ${booking.car.model}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Pickup Date</strong></td>
+            <td>${booking.pickupDate.toISOString().split("T")[0]}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Return Date</strong></td>
+            <td>${booking.returnDate.toISOString().split("T")[0]}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Location</strong></td>
+            <td>${booking.car.location}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Total Price</strong></td>
+            <td>₹${booking.price}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Status</strong></td>
+            <td style="color:${status === "confirmed" ? "green" : "red"};">
+                <b>${status.toUpperCase()}</b>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    ${status === "confirmed"
+                ? `<p>Your booking has been <b>confirmed</b>. We look forward to serving you!</p>`
+                : `<p>Unfortunately, your booking has been <b>cancelled</b>. If you have any questions, please contact the owner.</p>`
+            }
+
+    <hr>
+
+    <p>Thank you for choosing <strong>GoCarRent</strong>.</p>
+
+</div>
+`;
+
+        await sendEmail(
+            booking.user.email,
+            subject,
+            html
+        );
 
         res.json({ success: true, message: "Status Updated" })
     } catch (error) {

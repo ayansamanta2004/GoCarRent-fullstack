@@ -5,6 +5,7 @@ import connectDB from "./configs/db.js";
 import userRouter from "./routes/userRoutes.js";
 import ownerRouter from "./routes/ownerRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
+import testRouter from "./routes/testRoutes.js";
 
 // Initialize Express App
 const app = express()
@@ -15,6 +16,7 @@ await connectDB()
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/test", testRouter);
 
 app.get('/', (req, res) => res.send("Server is running"))
 app.use('/api/user', userRouter)

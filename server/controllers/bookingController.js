@@ -1,5 +1,7 @@
 import Booking from "../models/Booking.js";
 import Car from "../models/Car.js";
+import sendEmail from "../utils/sendEmail.js";
+import User from "../models/User.js";
 
 
 
@@ -49,7 +51,7 @@ export const createBooking = async (req, res) => {
             return res.json({ success: false, message: "Car is not available" })
         }
 
-        const carData = await Car.findById(car)
+        const carData = await Car.findById(car).populate("owner");
 
         // Calculate price based on pickupDate and returnDate
         const picked = new Date(pickupDate);
@@ -57,7 +59,84 @@ export const createBooking = async (req, res) => {
         const noOfDays = Math.ceil((returned - picked) / (1000 * 60 * 60 * 24))
         const price = carData.pricePerDay * noOfDays;
 
-        await Booking.create({ car, owner: carData.owner, user: _id, pickupDate, returnDate, price })
+        const customer = await User.findById(_id).select("name email");
+
+        await Booking.create({ car, owner: carData.owner._id, user: _id, pickupDate, returnDate, price })
+
+        await sendEmail(
+            carData.owner.email,
+            "🚗 New Booking Received - GoCarRent",
+            `
+    <div style="font-family: Arial, sans-serif; line-height:1.6">
+
+        <h2>Hello ${carData.owner.name},</h2>
+
+        <p>
+            Great news! 🎉 Your car has just been booked on
+            <strong>GoCarRent</strong>.
+        </p>
+
+        <h3>Customer Details</h3>
+
+        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
+            <tr>
+                <td><strong>Name</strong></td>
+                <td>${customer.name}</td>
+            </tr>
+            <tr>
+                <td><strong>Email</strong></td>
+                <td>${customer.email}</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <h3>Booking Details</h3>
+
+        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
+            <tr>
+                <td><strong>Car</strong></td>
+                <td>${carData.brand} ${carData.model}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Pickup Date</strong></td>
+                <td>${pickupDate}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Return Date</strong></td>
+                <td>${returnDate}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Total Price</strong></td>
+                <td>₹${price}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Status</strong></td>
+                <td>Pending Confirmation</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <p>
+            Please log in to your GoCarRent Owner Dashboard to
+            confirm or cancel this booking.
+        </p>
+
+        <hr>
+
+        <p>
+            Thank you,<br>
+            <strong>GoCarRent Team</strong>
+        </p>
+
+    </div>
+    `
+        );
 
         res.json({ success: true, message: "Booking Created" })
 
@@ -85,10 +164,10 @@ export const getUserBookings = async (req, res) => {
 // API to get Owner Bookings
 export const getOwnerBookings = async (req, res) => {
     try {
-        if(req.user.role !== 'owner'){
-            return res.json({success: false, message: "Unauthorized"})
+        if (req.user.role !== 'owner') {
+            return res.json({ success: false, message: "Unauthorized" })
         }
-        const bookings = await Booking.find({owner: req.user._id}).populate('car user').select("-user.password").sort({createdAt: -1})
+        const bookings = await Booking.find({ owner: req.user._id }).populate('car user').select("-user.password").sort({ createdAt: -1 })
         res.json({ success: true, bookings })
 
     } catch (error) {
@@ -101,19 +180,19 @@ export const getOwnerBookings = async (req, res) => {
 // API to change booking status
 export const changeBookingStatus = async (req, res) => {
     try {
-        const {_id} = req.user;
-        const {bookingId, status} = req.body
+        const { _id } = req.user;
+        const { bookingId, status } = req.body
 
         const booking = await Booking.findById(bookingId)
 
-        if(booking.owner.toString() !== _id.toString()) {
-            return res.json({success: false, message: "Unauthorized"})
+        if (booking.owner.toString() !== _id.toString()) {
+            return res.json({ success: false, message: "Unauthorized" })
         }
 
         booking.status = status;
         await booking.save();
 
-        res.json({success: true, message: "Status Updated"})
+        res.json({ success: true, message: "Status Updated" })
     } catch (error) {
         console.log(error.message);
         res.json({ success: false, message: error.message })

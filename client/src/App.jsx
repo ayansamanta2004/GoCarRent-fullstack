@@ -14,6 +14,7 @@ import ManageBookings from './pages/owner/ManageBookings'
 import Login from './components/Login'
 import { Toaster } from 'react-hot-toast'
 import { useAppContext } from './context/AppContext'
+import ChatBot from "./components/ChatBot";
 
 const App = () => {
 
@@ -41,6 +42,9 @@ const App = () => {
       </Routes>
 
       {!isOwnerPath && <Footer />}
+
+      {/* Floating AI Chatbot */}
+      <ChatBot />
     </>
   )
 }

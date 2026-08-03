@@ -15,6 +15,7 @@ import Login from './components/Login'
 import { Toaster } from 'react-hot-toast'
 import { useAppContext } from './context/AppContext'
 import ChatBot from "./components/ChatBot";
+import Payment from "./pages/Payment";
 
 const App = () => {
 
@@ -32,6 +33,7 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/car-details/:id' element={<CarDetails />} />
         <Route path='/cars' element={<Cars />} />
+        <Route path="/payment" element={<Payment />} />
         <Route path='/my-bookings' element={<MyBookings />} />
         <Route path='/owner' element={<Layout />}>
           <Route index element={<Dashboard />} />

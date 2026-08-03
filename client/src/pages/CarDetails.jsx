@@ -18,22 +18,14 @@ const CarDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { data } = await axios.post('/api/bookings/create', {
-        car: id,
+
+    navigate("/payment", {
+      state: {
+        car,
         pickupDate,
         returnDate
-      })
-
-      if (data.success) {
-        toast.success(data.message)
-        navigate('/my-bookings')
-      } else {
-        toast.error(data.message)
       }
-    } catch (error) {
-      toast.error(error.message)
-    }
+    });
   }
 
   useEffect(() => {
@@ -115,11 +107,11 @@ const CarDetails = () => {
         </motion.div>
 
         {/* Right: Booking form */}
-        <motion.form 
-        initial={{opacity: 0, y: 30}}
-        animate={{opacity: 1, y: 0}}
-        transition={{duration: 0.6, delay: 0.3}}
-        onSubmit={handleSubmit} className='shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6 text-gray-500'>
+        <motion.form
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          onSubmit={handleSubmit} className='shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6 text-gray-500'>
 
           <p className='flex items-center justify-between text-2xl text-gray-800 font-semibold'>{currency}{car.pricePerDay}<span className='text-base text-gray-400 font-normal'> per day</span></p>
 

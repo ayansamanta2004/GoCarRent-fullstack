@@ -44,7 +44,14 @@ export const checkAvailabilityOfCar = async (req, res) => {
 export const createBooking = async (req, res) => {
     try {
         const { _id } = req.user;
-        const { car, pickupDate, returnDate } = req.body;
+        const {
+            car,
+            pickupDate,
+            returnDate,
+            paymentMethod,
+            transactionId,
+            paymentStatus
+        } = req.body;
 
         const isAvailable = await checkAvailability(car, pickupDate, returnDate)
         if (!isAvailable) {
@@ -61,7 +68,20 @@ export const createBooking = async (req, res) => {
 
         const customer = await User.findById(_id).select("name email");
 
-        await Booking.create({ car, owner: carData.owner._id, user: _id, pickupDate, returnDate, price })
+        await Booking.create({
+            car,
+            owner: carData.owner._id,
+            user: _id,
+            pickupDate,
+            returnDate,
+            price,
+
+            paymentMethod,
+            transactionId,
+            paymentStatus,
+
+            paidAt: new Date()
+        });
 
         await sendEmail(
             carData.owner.email,

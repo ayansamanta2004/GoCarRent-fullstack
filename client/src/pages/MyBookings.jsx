@@ -25,8 +25,19 @@ const MyBookings = () => {
   }
 
   useEffect(() => {
-    user && fetchMyBookings()
-  }, [user])
+    if (!user) return;
+
+    // Initial fetch
+    fetchMyBookings();
+
+    // Refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchMyBookings();
+    }, 5000);
+
+    return () => clearInterval(interval);
+
+  }, [user]);
 
   return (
     <motion.div
@@ -63,7 +74,17 @@ const MyBookings = () => {
             <div className='md:col-span-2'>
               <div className='flex items-center gap-2'>
                 <p className='px-3 py-1.5 bg-light rounded'>Booking #{index + 1}</p>
-                <p className={`px-3 py-1 text-xs rounded-full ${booking.status === 'confirmed' ? 'bg-green-400/15 text-green-600' : 'bg-red-400/15 text-red-600'}`}>{booking.status}</p>
+                <p
+                  className={`px-3 py-1 text-xs rounded-full
+    ${booking.status === "confirmed"
+                      ? "bg-green-400/15 text-green-600"
+                      : booking.status === "pending"
+                        ? "bg-yellow-400/15 text-yellow-600"
+                        : "bg-red-400/15 text-red-600"
+                    }`}
+                >
+                  {booking.status}
+                </p>
               </div>
 
               <div className='flex items-start gap-2 mt-3'>
@@ -81,6 +102,82 @@ const MyBookings = () => {
                   <p>{booking.car.location}</p>
                 </div>
               </div>
+
+              <div className="mt-5 border-t pt-4">
+
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Payment Details
+                </h3>
+
+                <div className="space-y-1 text-sm">
+
+                  <p>
+                    <span className="font-medium">Payment Status:</span>{" "}
+                    <span
+                      className={
+                        booking.paymentStatus === "paid"
+                          ? "text-green-600"
+                          : booking.paymentStatus === "refunded"
+                            ? "text-blue-600"
+                            : "text-red-600"
+                      }
+                    >
+                      {booking.paymentStatus.toUpperCase()}
+                    </span>
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Payment Method:</span>{" "}
+                    {booking.paymentMethod.toUpperCase()}
+                  </p>
+
+                  <p>
+                    <span className="font-medium">Transaction ID:</span>{" "}
+                    {booking.transactionId}
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              {
+                booking.status === "cancelled" && (
+                  <div className="mt-5 border rounded-lg bg-red-50 p-4">
+
+                    <h3 className="text-red-700 font-semibold mb-3">
+                      Refund Details
+                    </h3>
+
+                    <div className="space-y-2">
+
+                      <p>
+                        💰 <strong>Refund Amount:</strong> {currency}{booking.refundAmount}
+                      </p>
+
+                      <p>
+                        🔄 <strong>Refund Status:</strong>{" "}
+                        <span className="text-blue-600">
+                          {booking.refundStatus.toUpperCase()}
+                        </span>
+                      </p>
+
+                      <p>
+                        📅 <strong>Refund Initiated:</strong>{" "}
+                        {booking.refundDate
+                          ? booking.refundDate.split("T")[0]
+                          : "N/A"}
+                      </p>
+
+                      <p>
+                        ⏳ <strong>Expected Refund:</strong> 3–5 Business Days
+                      </p>
+
+                    </div>
+
+                  </div>
+                )
+              }
 
             </div>
 

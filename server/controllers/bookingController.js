@@ -53,6 +53,8 @@ export const createBooking = async (req, res) => {
             paymentStatus
         } = req.body;
 
+        console.log("Received transactionId:", transactionId);
+
         const isAvailable = await checkAvailability(car, pickupDate, returnDate)
         if (!isAvailable) {
             return res.json({ success: false, message: "Car is not available" })
@@ -202,6 +204,12 @@ export const changeBookingStatus = async (req, res) => {
     try {
         const { _id } = req.user;
         const { bookingId, status } = req.body
+        if (!["pending", "confirmed", "cancelled"].includes(status)) {
+            return res.json({
+                success: false,
+                message: "Invalid booking status"
+            });
+        }
 
         const booking = await Booking.findById(bookingId)
             .populate("user")
@@ -219,7 +227,50 @@ export const changeBookingStatus = async (req, res) => {
         }
 
         booking.status = status;
+
+        // If booking is cancelled, initiate refund
+        if (status === "cancelled") {
+
+            booking.paymentStatus = "refunded";
+
+            booking.refundAmount = booking.price;
+
+            booking.refundStatus = "initiated";
+
+            booking.refundDate = new Date();
+
+        }
+
         await booking.save();
+
+        // Simulate bank processing refund
+        if (status === "cancelled") {
+
+            setTimeout(async () => {
+
+                try {
+
+                    const refundBooking = await Booking.findById(booking._id);
+
+                    if (!refundBooking) return;
+
+                    refundBooking.refundStatus = "completed";
+
+                    await refundBooking.save();
+
+                    console.log(
+                        `Refund completed for Booking ${refundBooking._id}`
+                    );
+
+                } catch (err) {
+
+                    console.log(err.message);
+
+                }
+
+            }, 50000); // 10 seconds
+
+        }
 
         let subject = "";
 
@@ -273,8 +324,51 @@ export const changeBookingStatus = async (req, res) => {
     <br>
 
     ${status === "confirmed"
-                ? `<p>Your booking has been <b>confirmed</b>. We look forward to serving you!</p>`
-                : `<p>Unfortunately, your booking has been <b>cancelled</b>. If you have any questions, please contact the owner.</p>`
+                ? `
+        <p>
+            Your booking has been
+            <b>confirmed</b>.
+            We look forward to serving you!
+        </p>
+      `
+                : `
+        <p>
+            Unfortunately, your booking has been
+            <b>cancelled</b>.
+        </p>
+
+        <h3>Refund Details</h3>
+
+        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
+
+            <tr>
+                <td><strong>Refund Amount</strong></td>
+                <td>₹${booking.refundAmount}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Refund Status</strong></td>
+                <td>${booking.refundStatus.toUpperCase()}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Expected Refund Time</strong></td>
+                <td>3–5 Business Days</td>
+            </tr>
+
+            <tr>
+                <td><strong>Transaction ID</strong></td>
+                <td>${booking.transactionId}</td>
+            </tr>
+
+        </table>
+
+        <br>
+
+        <p>
+            Your refund has been initiated and will be credited to your original payment method.
+        </p>
+      `
             }
 
     <hr>
@@ -283,6 +377,9 @@ export const changeBookingStatus = async (req, res) => {
 
 </div>
 `;
+
+        // console.log("Booking Transaction ID:", booking.transactionId);
+        // console.log(booking);
 
         await sendEmail(
             booking.user.email,

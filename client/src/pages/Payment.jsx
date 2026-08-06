@@ -79,6 +79,7 @@ const Payment = () => {
             }
 
             const payment = paymentResponse.data.payment;
+            // console.log(payment)
 
             // STEP 3 : Create Booking
             const bookingResponse = await axios.post(

@@ -475,43 +475,43 @@ VITE_CURRENCY=₹
 
 ## 🏠 Home Page
 
-> Add Screenshot Here
+![GoCarRent Home Page](./screenshots/home.png)
 
 ---
 
 ## 🚗 Cars Page
 
-> Add Screenshot Here
+![Cars Page](./screenshots/cars.png)
 
 ---
 
 ## 📄 Car Details
 
-> Add Screenshot Here
+![Car Details](./screenshots/car-details.png)
 
 ---
 
 ## 📅 My Bookings
 
-> Add Screenshot Here
+![My Bookings](./screenshots/my-bookings.png)
 
 ---
 
 ## 📊 Dashboard
 
-> Add Screenshot Here
+![Dashboard](./screenshots/dashboard.png)
 
 ---
 
 ## 🚘 Manage Cars
 
-> Add Screenshot Here
+![Manage Cars](./screenshots/manage-cars.png)
 
 ---
 
 ## 📖 Manage Bookings
 
-> Add Screenshot Here
+![Manage Bookings](./screenshots/manage-bookings.png)
 
 ---
 

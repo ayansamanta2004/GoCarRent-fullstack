@@ -307,6 +307,48 @@ Owner Cancels Paid Booking
        ▼
     Customer
 ```
+## Payment & Refund Flow
+```text
+Select Payment Method
+        │
+        ▼
+Mock Payment
+        │
+        ▼
+Transaction ID Generated
+        │
+        ▼
+Booking Created
+        │
+        ▼
+Owner Confirms / Cancels
+        │
+        ├───────────────┐
+        │               │
+     Confirm         Cancel
+        │               │
+        ▼               ▼
+Booking Confirmed   Mock Refund
+                        │
+                        ▼
+                Refund Status Updated
+                        │
+                        ▼
+                  My Bookings
+```
+## AI Support Flow
+```text
+User
+ │
+ ▼
+AI Chatbot
+ │
+ ▼
+OpenRouter API
+ │
+ ▼
+AI Response
+```
 
 ---
 
@@ -476,7 +518,6 @@ VITE_CURRENCY=₹
 # 🌟 Future Improvements
 
 - 💳 Online Payment Gateway
-- 📧 Email Notifications
 - ⭐ Reviews & Ratings
 - ❤️ Wishlist
 - 🔔 Real-time Notifications

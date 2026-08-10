@@ -82,8 +82,8 @@ const Footer = () => {
                         <ul className='mt-3 flex flex-col gap-1.5'>
                             <li>Sector V, Bidhannagar</li>
                             <li>Kolkata, West Bengal 700091</li>
-                            <li>+91 9876543210</li>
-                            <li>gocarrent@gmail.com</li>
+                            <li>+91 9635130690</li>
+                            <li>gocarrent.notify@gmail.com</li>
                         </ul>
                     </div>
                 </motion.div>
